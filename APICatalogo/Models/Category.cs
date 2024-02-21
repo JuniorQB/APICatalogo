@@ -1,4 +1,6 @@
-﻿namespace APICatalogo.Models;
+﻿using System.Collections.ObjectModel;
+
+namespace APICatalogo.Models;
 
 public class Category
 {
@@ -6,5 +8,10 @@ public class Category
     public string? Name { get; set; }
     public string? ImageURL { get; set; }
 
+    public ICollection<Product> Products { get; set; }
 
+    public Category()
+    {
+        Products = new Collection<Product>();
+    }
 }
