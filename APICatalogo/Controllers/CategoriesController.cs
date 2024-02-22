@@ -25,7 +25,15 @@ public class CategoriesController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Category>> Get()
     {
-        return _context.Categories.ToList();
+        try
+        {
+            return _context.Categories.AsNoTracking().ToList();
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Error mesage");
+        }
+        
     }
 
     [HttpGet("{id:int}", Name = "GetCategory")]
