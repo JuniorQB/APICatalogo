@@ -2,6 +2,7 @@
 using APICatalogo.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Controllers;
 [Route("[controller]")]
@@ -46,4 +47,17 @@ public class ProductsController : ControllerBase
         return new CreatedAtRouteResult("GetResult", new { id = product.ProductId }, product);
     }
 
+
+    [HttpPut("{id:int}")]
+    public ActionResult Put(int id, Product product) { 
+
+        if(id != product.ProductId)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(product).State = EntityState.Modified;
+
+        return Ok(product);
+    }
 }
