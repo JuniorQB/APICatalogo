@@ -60,4 +60,18 @@ public class ProductsController : ControllerBase
 
         return Ok(product);
     }
+
+    [HttpDelete("{id:int")]
+    public ActionResult Delete(int id)
+    {
+        var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+
+        if (product is null) return NotFound("Product not found");
+
+        _context.Products.Remove(product);
+
+        _context.SaveChanges();
+
+        return Ok(product);
+    }
 }
