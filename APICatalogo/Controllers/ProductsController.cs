@@ -1,4 +1,5 @@
 ﻿using APICatalogo.Context;
+using APICatalogo.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,4 +15,15 @@ public class ProductsController : ControllerBase
     {
         _context = context;
     }
+
+    [HttpGet]
+    public ActionResult<IEnumerable<Product>> Get()
+    {
+        var products = _context.Products.ToList();
+
+        if (products is null) return NotFound("Products not found");
+
+        return products;
+    }
+
 }
