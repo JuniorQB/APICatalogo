@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using APICatalogo.Context;
 using APICatalogo.Models;
+using APICatalogo.Filters;
 
 namespace APICatalogo.Controllers;
 [Route("[controller]")]
@@ -23,6 +24,7 @@ public class CategoriesController : ControllerBase
 
    
     [HttpGet]
+    [ServiceFilter(typeof(ApiLoggingFilter))]
     public ActionResult<IEnumerable<Category>> Get()
     {
         try
