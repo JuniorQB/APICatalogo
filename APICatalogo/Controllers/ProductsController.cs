@@ -1,9 +1,11 @@
-﻿using APICatalogo.Context;
-using APICatalogo.Models;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using APICatalogo.Context;
+using APICatalogo.Models;
 namespace APICatalogo.Controllers;
+
+
 [Route("[controller]")]
 [ApiController]
 public class ProductsController : ControllerBase
@@ -26,7 +28,7 @@ public class ProductsController : ControllerBase
         return products;
     }
 
-    [HttpGet("{id:int}", Name = "GetResult")]
+   [HttpGet("{id:int:min(1)}", Name="GetResult")]
     public ActionResult<Product> Get(int id)
     {
         var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
@@ -35,7 +37,7 @@ public class ProductsController : ControllerBase
 
         return product;
     }
-
+   
     [HttpPost]
     public ActionResult Post(Product product)
     {
@@ -60,7 +62,7 @@ public class ProductsController : ControllerBase
         return Ok(product);
     }
 
-    [HttpDelete("{id:int")]
+    [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
         var product = _context.Products.FirstOrDefault(p => p.ProductId == id);

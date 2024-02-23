@@ -1,7 +1,7 @@
-﻿using APICatalogo.Context;
-using APICatalogo.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using APICatalogo.Context;
+using APICatalogo.Models;
 
 namespace APICatalogo.Controllers;
 [Route("[controller]")]
@@ -21,7 +21,7 @@ public class CategoriesController : ControllerBase
         return _context.Categories.Include(p=>p.Products).ToList();
     }
 
-
+   
     [HttpGet]
     public ActionResult<IEnumerable<Category>> Get()
     {
@@ -36,7 +36,7 @@ public class CategoriesController : ControllerBase
         
     }
 
-    [HttpGet("{id:int}", Name = "GetCategory")]
+    [HttpGet("{id:int}", Name="GetCategory")]
     public ActionResult<Category> Get(int id)
     {
         var category = _context.Categories.FirstOrDefault(p => p.CategoryId == id);
