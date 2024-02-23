@@ -10,15 +10,19 @@ namespace APICatalogo.Controllers;
 public class CategoriesController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly ILogger _logger;
 
-    public CategoriesController(AppDbContext context)
+    public CategoriesController(AppDbContext context, ILogger<CategoriesController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [HttpGet("products")]
     public ActionResult<IEnumerable<Category>> GetCategoriesProducts()
     {
+        _logger.LogInformation("======================= GETCATEGORIESPRODUCTS==================");
+
         return _context.Categories.Include(p=>p.Products).ToList();
     }
 
