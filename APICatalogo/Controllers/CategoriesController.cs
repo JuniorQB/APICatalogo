@@ -3,18 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using APICatalogo.Context;
 using APICatalogo.Models;
 using APICatalogo.Filters;
+using APICatalogo.Repositories;
 
 namespace APICatalogo.Controllers;
 [Route("[controller]")]
 [ApiController]
 public class CategoriesController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly ICategorieRepository _repository;
     private readonly ILogger _logger;
 
-    public CategoriesController(AppDbContext context, ILogger<CategoriesController> logger)
+    public CategoriesController(ICategorieRepository repository, ILogger<CategoriesController> logger)
     {
-        _context = context;
+        _repository = repository;
         _logger = logger;
     }
 
@@ -31,21 +32,16 @@ public class CategoriesController : ControllerBase
     [ServiceFilter(typeof(ApiLoggingFilter))]
     public ActionResult<IEnumerable<Category>> Get()
     {
-        try
-        {
-            return _context.Categories.AsNoTracking().ToList();
-        }
-        catch (Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, "Error mesage");
-        }
+       var categories =  _repository.GetCategories();
+
+        return Ok(categories);
         
     }
 
     [HttpGet("{id:int}", Name="GetCategory")]
     public ActionResult<Category> Get(int id)
     {
-        var category = _context.Categories.FirstOrDefault(p => p.CategoryId == id);
+        var category = _repository.GetCategory(id);
 
         if (category == null)
         {
@@ -60,11 +56,10 @@ public class CategoriesController : ControllerBase
         if (category is null)
             return BadRequest();
 
-        _context.Categories.Add(category);
-        _context.SaveChanges();
+        var createdCategory = _repository.CreateCategory(category);
 
         return new CreatedAtRouteResult("GetCategory",
-            new { id = category.CategoryId }, category);
+            new { id = createdCategory.CategoryId }, createdCategory);
     }
 
     [HttpPut("{id:int}")]
@@ -74,22 +69,20 @@ public class CategoriesController : ControllerBase
         {
             return BadRequest();
         }
-        _context.Entry(category).State = EntityState.Modified;
-        _context.SaveChanges();
+       _repository.UpdateCategory(category);
         return Ok(category);
     }
 
     [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
-        var category = _context.Categories.FirstOrDefault(p => p.CategoryId == id);
+        var category = _repository.GetCategory(id);
 
         if (category == null)
         {
             return NotFound("\"Category not found.");
         }
-        _context.Categories.Remove(category);
-        _context.SaveChanges();
+       var deletedCategory = _repository.DeleteCategory(id);
         return Ok(category);
     }
 }
