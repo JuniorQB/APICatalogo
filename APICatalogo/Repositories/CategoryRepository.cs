@@ -22,6 +22,10 @@ public class CategoryRepository : ICategorieRepository
         return _context.Categories.FirstOrDefault(c => c.CategoryId == id);
     }
 
+    public IEnumerable<Category> GetCategoriesWithProducts()
+    {
+        return _context.Categories.Include(p => p.Products).ToList(); 
+    }
 
     public Category CreateCategory(Category category)
     {
@@ -60,4 +64,5 @@ public class CategoryRepository : ICategorieRepository
 
     }
 
+   
 }

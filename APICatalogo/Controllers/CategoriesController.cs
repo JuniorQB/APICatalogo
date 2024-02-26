@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using APICatalogo.Context;
 using APICatalogo.Models;
 using APICatalogo.Filters;
 using APICatalogo.Repositories;
@@ -24,7 +22,7 @@ public class CategoriesController : ControllerBase
     {
         _logger.LogInformation("======================= GETCATEGORIESPRODUCTS==================");
 
-        return _context.Categories.Include(p=>p.Products).ToList();
+        return Ok(_repository.GetCategoriesWithProducts());
     }
 
    
