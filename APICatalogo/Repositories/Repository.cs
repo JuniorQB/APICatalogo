@@ -39,8 +39,8 @@ public class Repository<T> : IRepository<T> where T : class
     }
     public T Delete(T entity)
     {
-       _context.Set<T>().Remove(entity));
-        _context.SaveChanges();
+       _context.Set<T>().Remove(entity);
+       _context.SaveChanges();
         return entity;
     }
 
