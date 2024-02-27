@@ -10,19 +10,19 @@ namespace APICatalogo.Controllers;
 public class ProductsController : ControllerBase
 {
 
-    private readonly IProductRepository _productRepository;
-    private readonly IRepository<Product> _repository;
+    private readonly IUnitOfWork _repository;
+    
 
-    public ProductsController(IRepository<Product> repository, IProductRepository productRepository )
+    public ProductsController(IUnitOfWork repository )
     {
         _repository = repository;
-        _productRepository = productRepository;
+        
     }
 
     [HttpGet("proucts/{id}")]
     public ActionResult<IEnumerable<Product>> GetProductByCategory(int id)
     {
-        var products = _productRepository.GetProductsByCategory(id);
+        var products = _repository.ProductRepository.GetProductsByCategory(id);
 
         if (products is null) return NotFound("Products not found");
 
@@ -32,7 +32,7 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Product>> Get()
     {
-        var products = _repository.GetAll();
+        var products = _repository.ProductRepository..GetAll();
 
         if (products is null) return NotFound("Products not found");
 
@@ -42,7 +42,7 @@ public class ProductsController : ControllerBase
    [HttpGet("{id:int:min(1)}", Name="GetResult")]
     public ActionResult<Product> Get(int id)
     {
-        var product = _repository.Get(p => p.ProductId == id);
+        var product = _repository.ProductRepository..Get(p => p.ProductId == id);
 
         if (product is null) return NotFound("Product not found");
 
@@ -53,8 +53,8 @@ public class ProductsController : ControllerBase
     public ActionResult Post(Product product)
     {
         if (product is null) return BadRequest();
-        var nProduct = _repository.Create(product);
-       
+        var nProduct = _repository.ProductRepository.Create(product);
+        _repository.Commit();
 
         return new CreatedAtRouteResult("GetResult", new { id = nProduct.ProductId }, nProduct);
     }
@@ -68,20 +68,21 @@ public class ProductsController : ControllerBase
             return BadRequest();
         }
 
-        var productUpdated = _repository.Update(product);
-
-            return Ok(productUpdated);
+        var productUpdated = _repository.ProductRepository.Update(product);
+        _repository.Commit();
+        return Ok(productUpdated);
        
     }
 
     [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
-        var product = _repository.Get(p => p.ProductId == id);
+        var product = _repository.ProductRepository.Get(p => p.ProductId == id);
 
         if (product is null) return NotFound();
 
-        _repository.Delete(product);
+        _repository.ProductRepository.Delete(product);
+        _repository.Commit();
          return Ok("Product deleted");
     }
 }

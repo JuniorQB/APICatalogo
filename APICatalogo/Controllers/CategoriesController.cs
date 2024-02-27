@@ -8,14 +8,13 @@ namespace APICatalogo.Controllers;
 [ApiController]
 public class CategoriesController : ControllerBase
 {
-    private readonly IRepository<Category> _repository;
-    private readonly ICategorieRepository _categoryRepository;
+    private readonly IUnitOfWork _repository;
+
     private readonly ILogger _logger;
 
-    public CategoriesController(IRepository<Category> repository, ICategorieRepository categoryRepository, ILogger<CategoriesController> logger)
+    public CategoriesController(IUnitOfWork repository, ILogger<CategoriesController> logger)
     {
         _repository = repository;
-        _categoryRepository = categoryRepository;
         _logger = logger;
     }
 
@@ -24,7 +23,7 @@ public class CategoriesController : ControllerBase
     {
         _logger.LogInformation("======================= GETCATEGORIESPRODUCTS==================");
 
-        return Ok(_categoryRepository.GetCategoriesWithProducts());
+        return Ok(_repository.CategorieRepository.GetCategoriesWithProducts());
     }
 
    
@@ -32,7 +31,7 @@ public class CategoriesController : ControllerBase
     [ServiceFilter(typeof(ApiLoggingFilter))]
     public ActionResult<IEnumerable<Category>> Get()
     {
-       var categories =  _repository.GetAll();
+       var categories =  _repository.CategorieRepository.GetAll();
 
         return Ok(categories);
         
@@ -41,7 +40,7 @@ public class CategoriesController : ControllerBase
     [HttpGet("{id:int}", Name="GetCategory")]
     public ActionResult<Category> Get(int id)
     {
-        var category = _repository.Get(c=> c.CategoryId == id);
+        var category = _repository.CategorieRepository.Get(c=> c.CategoryId == id);
 
         if (category == null)
         {
@@ -56,7 +55,8 @@ public class CategoriesController : ControllerBase
         if (category is null)
             return BadRequest();
 
-        var createdCategory = _repository.Create(category);
+        var createdCategory = _repository.CategorieRepository.Create(category);
+        _repository.Commit();
 
         return new CreatedAtRouteResult("GetCategory",
             new { id = createdCategory.CategoryId }, createdCategory);
@@ -69,20 +69,22 @@ public class CategoriesController : ControllerBase
         {
             return BadRequest();
         }
-       _repository.Update(category);
+        _repository.CategorieRepository.Update(category);
+        _repository.Commit();
         return Ok(category);
     }
 
     [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
-        var category = _repository.Get(c => c.CategoryId == id);
+        var category = _repository.CategorieRepository.Get(c => c.CategoryId == id);
 
         if (category == null)
         {
             return NotFound("\"Category not found.");
         }
-       var deletedCategory = _repository.Delete(category);
+       var deletedCategory = _repository.CategorieRepository.Delete(category);
+        _repository.Commit();
         return Ok(category);
     }
 }
