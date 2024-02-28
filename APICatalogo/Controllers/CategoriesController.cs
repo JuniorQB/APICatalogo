@@ -2,6 +2,7 @@
 using APICatalogo.Models;
 using APICatalogo.Filters;
 using APICatalogo.Repositories;
+using APICatalogo.DTOs;
 
 namespace APICatalogo.Controllers;
 [Route("[controller]")]
@@ -29,16 +30,35 @@ public class CategoriesController : ControllerBase
    
     [HttpGet]
     [ServiceFilter(typeof(ApiLoggingFilter))]
-    public ActionResult<IEnumerable<Category>> Get()
+    public ActionResult<IEnumerable<CategoryDTO>> Get()
     {
        var categories =  _repository.CategorieRepository.GetAll();
 
-        return Ok(categories);
+        if(categories is null)
+        {
+            return NotFound();
+
+        }
+
+        var categoriesDto = new List<CategoryDTO>();
+        foreach (var category in categories)
+        {
+            var categoryDTO = new CategoryDTO()
+            {
+                CategoryId = category.CategoryId,
+                Name = category.Name,
+                ImageURL = category.ImageURL
+            };
+
+            categoriesDto.Add(categoryDTO);
+        }
+
+        return Ok(categoriesDto);
         
     }
 
     [HttpGet("{id:int}", Name="GetCategory")]
-    public ActionResult<Category> Get(int id)
+    public ActionResult<CategoryDTO> Get(int id)
     {
         var category = _repository.CategorieRepository.Get(c=> c.CategoryId == id);
 
@@ -46,36 +66,74 @@ public class CategoriesController : ControllerBase
         {
             return NotFound("Category not found");
         }
-        return Ok(category);
+
+        var categoryDTO = new CategoryDTO()
+        {
+            CategoryId = category.CategoryId,
+            Name = category.Name,
+            ImageURL = category.ImageURL
+        };
+
+        return Ok(categoryDTO);
     }
 
     [HttpPost]
-    public ActionResult Post(Category category)
+    public ActionResult<CategoryDTO> Post(CategoryDTO categoryDTO)
     {
-        if (category is null)
+        if (categoryDTO is null)
             return BadRequest();
+
+        var category = new Category()
+        {
+            CategoryId = categoryDTO.CategoryId,
+            Name = categoryDTO.Name,
+            ImageURL = categoryDTO.ImageURL
+        };
 
         var createdCategory = _repository.CategorieRepository.Create(category);
         _repository.Commit();
 
+        var newcategoryDTO = new CategoryDTO()
+        {
+            CategoryId = createdCategory.CategoryId,
+            Name = createdCategory.Name,
+            ImageURL = createdCategory.ImageURL
+        };
+
+
+
         return new CreatedAtRouteResult("GetCategory",
-            new { id = createdCategory.CategoryId }, createdCategory);
+            new { id = newcategoryDTO.CategoryId }, newcategoryDTO);
     }
 
     [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Category category)
+    public ActionResult<CategoryDTO> Put(int id, CategoryDTO categoryDTO)
     {
-        if (id != category.CategoryId)
+        if (id != categoryDTO.CategoryId)
         {
             return BadRequest();
         }
+
+        var category = new Category()
+        {
+            CategoryId = categoryDTO.CategoryId,
+            Name = categoryDTO.Name,
+            ImageURL = categoryDTO.ImageURL
+        };
+
         _repository.CategorieRepository.Update(category);
         _repository.Commit();
-        return Ok(category);
+        var newcategoryDTO = new CategoryDTO()
+        {
+            CategoryId = category.CategoryId,
+            Name = category.Name,
+            ImageURL = category.ImageURL
+        };
+        return Ok(newcategoryDTO);
     }
 
     [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    public ActionResult<CategoryDTO> Delete(int id)
     {
         var category = _repository.CategorieRepository.Get(c => c.CategoryId == id);
 
@@ -85,6 +143,12 @@ public class CategoriesController : ControllerBase
         }
        var deletedCategory = _repository.CategorieRepository.Delete(category);
         _repository.Commit();
-        return Ok(category);
+        var deletedCategoryDTO = new CategoryDTO()
+        {
+            CategoryId = category.CategoryId,
+            Name = category.Name,
+            ImageURL = category.ImageURL
+        };
+        return Ok(deletedCategoryDTO);
     }
 }

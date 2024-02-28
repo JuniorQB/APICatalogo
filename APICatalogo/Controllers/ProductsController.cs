@@ -32,7 +32,7 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Product>> Get()
     {
-        var products = _repository.ProductRepository..GetAll();
+        var products = _repository.ProductRepository.GetAll();
 
         if (products is null) return NotFound("Products not found");
 
@@ -42,7 +42,7 @@ public class ProductsController : ControllerBase
    [HttpGet("{id:int:min(1)}", Name="GetResult")]
     public ActionResult<Product> Get(int id)
     {
-        var product = _repository.ProductRepository..Get(p => p.ProductId == id);
+        var product = _repository.ProductRepository.Get(p => p.ProductId == id);
 
         if (product is null) return NotFound("Product not found");
 
