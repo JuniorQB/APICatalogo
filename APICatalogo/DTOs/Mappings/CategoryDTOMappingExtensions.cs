@@ -5,7 +5,7 @@ namespace APICatalogo.DTOs.Mappings;
 
 public static class CategoryDTOMappingExtensions
 {
-    public static CategoryDTO? ToCategoryDTO(this CategoryDTO category)
+    public static CategoryDTO? ToCategoryDTO(this Category category)
     {
         if (category is null)
         {

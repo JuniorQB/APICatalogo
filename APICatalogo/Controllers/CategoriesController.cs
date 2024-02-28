@@ -3,6 +3,7 @@ using APICatalogo.Models;
 using APICatalogo.Filters;
 using APICatalogo.Repositories;
 using APICatalogo.DTOs;
+using APICatalogo.DTOs.Mappings;
 
 namespace APICatalogo.Controllers;
 [Route("[controller]")]
@@ -40,18 +41,8 @@ public class CategoriesController : ControllerBase
 
         }
 
-        var categoriesDto = new List<CategoryDTO>();
-        foreach (var category in categories)
-        {
-            var categoryDTO = new CategoryDTO()
-            {
-                CategoryId = category.CategoryId,
-                Name = category.Name,
-                ImageURL = category.ImageURL
-            };
-
-            categoriesDto.Add(categoryDTO);
-        }
+        var categoriesDto = categories.ToCategoryDtoList();
+      
 
         return Ok(categoriesDto);
         
@@ -67,13 +58,7 @@ public class CategoriesController : ControllerBase
             return NotFound("Category not found");
         }
 
-        var categoryDTO = new CategoryDTO()
-        {
-            CategoryId = category.CategoryId,
-            Name = category.Name,
-            ImageURL = category.ImageURL
-        };
-
+        var categoryDTO = category.ToCategoryDTO();
         return Ok(categoryDTO);
     }
 
@@ -83,22 +68,12 @@ public class CategoriesController : ControllerBase
         if (categoryDTO is null)
             return BadRequest();
 
-        var category = new Category()
-        {
-            CategoryId = categoryDTO.CategoryId,
-            Name = categoryDTO.Name,
-            ImageURL = categoryDTO.ImageURL
-        };
+        var category = categoryDTO.ToCategory();
 
         var createdCategory = _repository.CategorieRepository.Create(category);
         _repository.Commit();
 
-        var newcategoryDTO = new CategoryDTO()
-        {
-            CategoryId = createdCategory.CategoryId,
-            Name = createdCategory.Name,
-            ImageURL = createdCategory.ImageURL
-        };
+        var newcategoryDTO = category.ToCategoryDTO();
 
 
 
@@ -114,21 +89,12 @@ public class CategoriesController : ControllerBase
             return BadRequest();
         }
 
-        var category = new Category()
-        {
-            CategoryId = categoryDTO.CategoryId,
-            Name = categoryDTO.Name,
-            ImageURL = categoryDTO.ImageURL
-        };
+        var category = categoryDTO.ToCategory();
 
         _repository.CategorieRepository.Update(category);
         _repository.Commit();
-        var newcategoryDTO = new CategoryDTO()
-        {
-            CategoryId = category.CategoryId,
-            Name = category.Name,
-            ImageURL = category.ImageURL
-        };
+        var newcategoryDTO = category.ToCategoryDTO();
+
         return Ok(newcategoryDTO);
     }
 
@@ -143,12 +109,8 @@ public class CategoriesController : ControllerBase
         }
        var deletedCategory = _repository.CategorieRepository.Delete(category);
         _repository.Commit();
-        var deletedCategoryDTO = new CategoryDTO()
-        {
-            CategoryId = category.CategoryId,
-            Name = category.Name,
-            ImageURL = category.ImageURL
-        };
+        var deletedCategoryDTO = category.ToCategoryDTO();
+
         return Ok(deletedCategoryDTO);
     }
 }
