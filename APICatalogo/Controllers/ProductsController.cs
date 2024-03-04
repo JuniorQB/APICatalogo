@@ -5,6 +5,7 @@ using APICatalogo.Repositories;
 using APICatalogo.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
+using APICatalogo.Pagination;
 namespace APICatalogo.Controllers;
 
 
@@ -36,6 +37,19 @@ public class ProductsController : ControllerBase
 
         return Ok(productsDto);
     }
+
+    [HttpGet("pagination")]
+    public ActionResult<IEnumerable<ProductDTO>> Get([FromQuery] ProductsParameters productsParameters)
+    {
+        var products = _repository.ProductRepository.GetProducts(productsParameters);
+
+        if (products is null) return NotFound("Products not found");
+
+        var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
+
+        return Ok(productsDto);
+    }
+
 
     [HttpGet]
     public ActionResult<IEnumerable<ProductDTO>> Get()
